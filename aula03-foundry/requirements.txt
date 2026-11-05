@@ -1,0 +1,5 @@
+azure-ai-projects>=2.3.0
+azure-identity
+tabulate
+flask>=3.0.0
+flask-cors>=4.0.0

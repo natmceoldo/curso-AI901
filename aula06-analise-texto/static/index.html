@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Analisador de texto</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #1f2937; }
+    h1 { font-size: 1.5rem; }
+    textarea { width: 100%; height: 140px; padding: .6rem; font-size: 1rem; box-sizing: border-box; }
+    button { margin-top: .6rem; padding: .6rem 1.2rem; font-size: 1rem; background: #0b5cad; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    .card { border: 1px solid #d1d5db; border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+    .erro { color: #b91c1c; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #d1d5db; padding: .4rem .6rem; text-align: left; }
+    th { background: #f3f4f6; }
+  </style>
+</head>
+<body>
+  <h1>Analisador de texto (Azure Language)</h1>
+  <p>Use apenas texto <strong>fictício</strong>. Nunca dados reais de pessoas.</p>
+
+  <textarea id="texto" placeholder="Olá, meu nome é Carla Mendes e meu telefone é (11) 99999-0000."></textarea>
+  <button id="botao">Analisar</button>
+
+  <div id="resultado"></div>
+
+  <script>
+    const botao = document.getElementById("botao");
+    const caixa = document.getElementById("texto");
+    const saida = document.getElementById("resultado");
+
+    // Escreve texto na tela de forma segura (sem interpretar HTML)
+    function celula(linha, valor) {
+      const td = document.createElement("td");
+      td.textContent = valor;
+      linha.appendChild(td);
+    }
+
+    botao.addEventListener("click", async () => {
+      saida.innerHTML = "";
+      botao.disabled = true;
+      try {
+        // Chama o NOSSO backend (a chave fica lá, não aqui)
+        const resp = await fetch("/analisar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ texto: caixa.value }),
+        });
+        const dados = await resp.json();
+
+        if (!resp.ok) {
+          saida.innerHTML = '<p class="erro"></p>';
+          saida.firstChild.textContent = dados.erro;
+          return;
+        }
+
+        // Cartão 1: idioma
+        const c1 = document.createElement("div");
+        c1.className = "card";
+        const pct = (dados.idioma.confianca * 100).toFixed(0);
+        c1.innerHTML = "<h2>Idioma</h2><p></p>";
+        c1.querySelector("p").textContent =
+          `${dados.idioma.nome} (${dados.idioma.codigo}) · confiança ${pct}%`;
+        saida.appendChild(c1);
+
+        // Cartão 2: texto redigido
+        const c2 = document.createElement("div");
+        c2.className = "card";
+        c2.innerHTML = "<h2>Texto com dados ocultados</h2><p></p>";
+        c2.querySelector("p").textContent = dados.texto_redigido;
+        saida.appendChild(c2);
+
+        // Cartão 3: tabela de entidades
+        const c3 = document.createElement("div");
+        c3.className = "card";
+        c3.innerHTML = "<h2>Dados pessoais encontrados</h2>";
+        if (dados.entidades.length === 0) {
+          c3.innerHTML += "<p>Nenhum dado pessoal encontrado.</p>";
+        } else {
+          const tabela = document.createElement("table");
+          tabela.innerHTML = "<tr><th>Texto</th><th>Type</th><th>Confidence</th><th>Offset</th><th>Length</th></tr>";
+          for (const e of dados.entidades) {
+            const tr = document.createElement("tr");
+            celula(tr, e.texto);
+            celula(tr, e.tipo);
+            celula(tr, (e.confianca * 100).toFixed(0) + "%");
+            celula(tr, e.offset);
+            celula(tr, e.tamanho);
+            tabela.appendChild(tr);
+          }
+          c3.appendChild(tabela);
+        }
+        saida.appendChild(c3);
+      } catch (erro) {
+        saida.innerHTML = '<p class="erro">Não consegui falar com o servidor. Ele está rodando?</p>';
+      } finally {
+        botao.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

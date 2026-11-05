@@ -1,0 +1,59 @@
+# ==========================================
+# Ambientes Virtuais Python
+# ==========================================
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================================
+# Caches e Arquivos Compilados do Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ==========================================
+# Arquivos de Configuração e Credenciais
+# ==========================================
+# Ignora arquivos de variáveis de ambiente com segredos reais
+.env
+.env.local
+.env.*.local
+# Permite explicitamente o arquivo de exemplo
+!.env.example
+
+# ==========================================
+# Arquivos Gerados por Testes e Execuções
+# ==========================================
+imagem_gerada.png
+*.log
+
+# ==========================================
+# Editores, IDEs e Sistema Operacional
+# ==========================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+

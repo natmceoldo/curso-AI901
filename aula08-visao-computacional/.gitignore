@@ -1,0 +1,21 @@
+# Ambientes virtuais
+venv/
+.venv/
+env/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+
+# Variáveis de ambiente e credenciais locais
+.env
+
+# Imagens geradas por scripts de teste
+imagem_gerada.png
+
+# Editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
